@@ -1,12 +1,8 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "Rob"
-date: "20 september 2015"
-output: 
-  html_document:
-    keep_md: true
----
-```{r}
+# Reproducible Research: Peer Assessment 1
+Rob  
+20 september 2015  
+
+```r
 ## in inline R code output: numbers >= 10^5 will be denoted in scientific notation,
 ## and rounded to 2 digits
 options(scipen = 1, digits = 2)
@@ -31,7 +27,8 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 
 ## Loading and preprocessing the data
 
-```{r}
+
+```r
 unzip(zipfile = "activity.zip")
 data <- read.csv("activity.csv")
 ```
@@ -42,22 +39,38 @@ data <- read.csv("activity.csv")
 In this part of the assignment, the missing values in the dataset can be ignored.
 
 A histogram of the total number of steps taken each day:
-```{r}
+
+```r
 AantalStappenPerDag <- aggregate(steps ~ date, data, sum, na.rm = TRUE)
 hist(AantalStappenPerDag$steps, main=NULL, xlab='Total number of steps taken per day')
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+
+```r
 mean(AantalStappenPerDag$steps)  
+```
+
+```
+## [1] 10766
+```
+
+```r
 median(AantalStappenPerDag$steps)
 ```
 
-- The __mean__ of the total number of steps taken per day is `r mean(AantalStappenPerDag$steps)`.
-- The __median__ of the total number of steps taken per day is `r median(AantalStappenPerDag$steps)`. 
+```
+## [1] 10765
+```
+
+- The __mean__ of the total number of steps taken per day is 10766.19.
+- The __median__ of the total number of steps taken per day is 10765. 
 
 ## What is the average daily activity pattern?
 
-```{r}
+
+```r
 library(ggplot2)
 GemAantalStappenPerInterval <- aggregate(steps ~ interval, data, mean, na.rm = TRUE)
 ggplot(data = GemAantalStappenPerInterval, aes(x = interval, y = steps)) + 
@@ -68,22 +81,42 @@ ggplot(data = GemAantalStappenPerInterval, aes(x = interval, y = steps)) +
   ylab("average # of steps")
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
+
+```r
 MaxGemIndex <- which.max(GemAantalStappenPerInterval$steps)
 GemAantalStappenPerInterval[MaxGemIndex, ]$interval
+```
+
+```
+## [1] 835
+```
+
+```r
 GemAantalStappenPerInterval[MaxGemIndex, ]$steps
 ```
 
-5-minute interval __`r GemAantalStappenPerInterval[MaxGemIndex, ]$interval`__, on average across all the days in the dataset, contains the maximum number of steps (`r GemAantalStappenPerInterval[MaxGemIndex, ]$steps`).
+```
+## [1] 206
+```
+
+5-minute interval __835__, on average across all the days in the dataset, contains the maximum number of steps (206.17).
 
 ## Imputing missing values
-```{r}
+
+```r
 sum(is.na(data$steps))
 ```
-The total number of missing values in the dataset (i.e. the total number of rows with NAs) is equal to __`r sum(is.na(data$steps))`__.
+
+```
+## [1] 2304
+```
+The total number of missing values in the dataset (i.e. the total number of rows with NAs) is equal to __2304__.
 
 A new dataset is made, with missing data replaced by the average number of steps for that 5-minute interval as computed above.
-```{r}
+
+```r
 dataAangevuld <- data  
 for (i in 1:nrow(dataAangevuld)) {
     if (is.na(dataAangevuld[i, ]$steps)) {
@@ -94,29 +127,46 @@ for (i in 1:nrow(dataAangevuld)) {
 
 
 A histogram of the total number of steps taken each day (with missing values filled in):
-```{r}
+
+```r
 AantalStappenPerDagAangevuld <- aggregate(steps ~ date, dataAangevuld, sum, na.rm = TRUE)
 hist(AantalStappenPerDagAangevuld$steps, main=NULL, xlab='Total number of steps taken per day')
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+
+
+```r
 mean(AantalStappenPerDagAangevuld$steps)  
+```
+
+```
+## [1] 10766
+```
+
+```r
 median(AantalStappenPerDagAangevuld$steps)
 ```
 
-- The __mean__ of the total number of steps taken per day is `r mean(AantalStappenPerDagAangevuld$steps)`, compared to  `r mean(AantalStappenPerDag$steps)` without missing values.
-- The __median__ of the total number of steps taken per day is `r median(AantalStappenPerDagAangevuld$steps)`, compared to  `r median(AantalStappenPerDag$steps)` without missing values. 
+```
+## [1] 10766
+```
+
+- The __mean__ of the total number of steps taken per day is 10766.19, compared to  10766.19 without missing values.
+- The __median__ of the total number of steps taken per day is 10766.19, compared to  10765 without missing values. 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 In this part of the assignment, the missing values in the dataset are filled in.
 
 A new factor variable is created in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
-```{r}
+
+```r
 dataAangevuld$dayType <- ifelse(as.POSIXlt(dataAangevuld$date)$wday %in% c('0','6'),'weekend','weekday')
 ```
 
 Plotted as a panel plot:
-```{r}
+
+```r
 library(ggplot2)
 GemAantalStappenPerIntervalAangevuld <- aggregate(steps ~ interval + dayType, dataAangevuld, mean, na.rm = TRUE)
 ggplot(data = GemAantalStappenPerIntervalAangevuld, aes(x = interval, y = steps)) + 
@@ -127,3 +177,5 @@ ggplot(data = GemAantalStappenPerIntervalAangevuld, aes(x = interval, y = steps)
   xlab("5-minute interval") + 
   ylab("average # of steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
